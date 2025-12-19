@@ -27,4 +27,4 @@ RUN mkdir -p logs
 EXPOSE 8000
 
 # Command to run the application (use FastAPI app factory)
-CMD ["uvicorn", "src.api.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+CMD sh -c 'uvicorn src.api.app:create_app --factory --host 0.0.0.0 --port ${PORT:-8000}'
