@@ -1,0 +1,239 @@
+{
+  "version": "1.0",
+  "created": "2024-12-13T20:00:00",
+  "total_papers": 3,
+  "total_authors": 25,
+  "description": "Sample gold standard dataset for testing evaluation metrics",
+  "papers": [
+    {
+      "paper_id": "2512.10957v1",
+      "title": "SceneMaker: Open-set 3D Scene Generation with Decoupled De-occlusion and Pose Estimation Model",
+      "authors": [
+        {
+          "name": "Yukai Shi",
+          "raw_affiliation": "Tsinghua University",
+          "normalized_affiliation": "Tsinghua University",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "university"
+        },
+        {
+          "name": "Weiyu Li",
+          "raw_affiliation": "HKUST",
+          "normalized_affiliation": "The Hong Kong University of Science and Technology",
+          "country": "Hong Kong",
+          "country_code": "HK",
+          "org_type": "university"
+        },
+        {
+          "name": "Zihao Wang",
+          "raw_affiliation": "LightIllusions",
+          "normalized_affiliation": "Light Illusions Ltd.",
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "org_type": "company"
+        },
+        {
+          "name": "Hongyang Li",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        },
+        {
+          "name": "Xingyu Chen",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        },
+        {
+          "name": "Ping Tan",
+          "raw_affiliation": "HKUST",
+          "normalized_affiliation": "The Hong Kong University of Science and Technology",
+          "country": "Hong Kong",
+          "country_code": "HK",
+          "org_type": "university"
+        },
+        {
+          "name": "Lei Zhang",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        }
+      ],
+      "source": "manual",
+      "annotator": "Sample Annotator",
+      "annotation_date": "2024-12-13",
+      "notes": "Test paper for evaluation"
+    },
+    {
+      "paper_id": "2512.10952v1",
+      "title": "Hierarchical Dataset Selection for High-Quality Data Sharing",
+      "authors": [
+        {
+          "name": "Xiaona Zhou",
+          "raw_affiliation": "University of Illinois Urbana-Champaign",
+          "normalized_affiliation": "University of Illinois Urbana-Champaign",
+          "country": "United States",
+          "country_code": "US",
+          "org_type": "university"
+        },
+        {
+          "name": "Yingyan Zeng",
+          "raw_affiliation": "University of Cincinnati",
+          "normalized_affiliation": "University of Cincinnati",
+          "country": "United States",
+          "country_code": "US",
+          "org_type": "university"
+        },
+        {
+          "name": "Ran Jin",
+          "raw_affiliation": "Virginia Tech",
+          "normalized_affiliation": "Virginia Polytechnic Institute and State University",
+          "country": "United States",
+          "country_code": "US",
+          "org_type": "university"
+        },
+        {
+          "name": "Ismini Lourentzou",
+          "raw_affiliation": "University of Illinois Urbana-Champaign",
+          "normalized_affiliation": "University of Illinois Urbana-Champaign",
+          "country": "United States",
+          "country_code": "US",
+          "org_type": "university"
+        }
+      ],
+      "source": "manual",
+      "annotator": "Sample Annotator",
+      "annotation_date": "2024-12-13",
+      "notes": "Test paper for evaluation"
+    },
+    {
+      "paper_id": "2512.10949v1",
+      "title": "Are We Ready for RL in Text-to-3D Generation? A Progressive Investigation",
+      "authors": [
+        {
+          "name": "Yiwen Tang",
+          "raw_affiliation": "Northwestern Polytechnical University",
+          "normalized_affiliation": "Northwestern Polytechnical University",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "university"
+        },
+        {
+          "name": "Zoey Guo",
+          "raw_affiliation": "The Chinese University of Hong Kong",
+          "normalized_affiliation": "The Chinese University of Hong Kong",
+          "country": "Hong Kong",
+          "country_code": "HK",
+          "org_type": "university"
+        },
+        {
+          "name": "Kaixin Zhu",
+          "raw_affiliation": "Peking University",
+          "normalized_affiliation": "Peking University",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "university"
+        },
+        {
+          "name": "Ray Zhang",
+          "raw_affiliation": "The Chinese University of Hong Kong",
+          "normalized_affiliation": "The Chinese University of Hong Kong",
+          "country": "Hong Kong",
+          "country_code": "HK",
+          "org_type": "university"
+        },
+        {
+          "name": "Qizhi Chen",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        },
+        {
+          "name": "Dongzhi Jiang",
+          "raw_affiliation": "The Chinese University of Hong Kong",
+          "normalized_affiliation": "The Chinese University of Hong Kong",
+          "country": "Hong Kong",
+          "country_code": "HK",
+          "org_type": "university"
+        },
+        {
+          "name": "Junli Liu",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        },
+        {
+          "name": "Bohan Zeng",
+          "raw_affiliation": "Peking University",
+          "normalized_affiliation": "Peking University",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "university"
+        },
+        {
+          "name": "Qingchao Chen",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        },
+        {
+          "name": "Fangzhou Hong",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        },
+        {
+          "name": "Ziwei Liu",
+          "raw_affiliation": "Nanyang Technological University",
+          "normalized_affiliation": "Nanyang Technological University",
+          "country": "Singapore",
+          "country_code": "SG",
+          "org_type": "university"
+        },
+        {
+          "name": "Dahua Lin",
+          "raw_affiliation": "The Chinese University of Hong Kong",
+          "normalized_affiliation": "The Chinese University of Hong Kong",
+          "country": "Hong Kong",
+          "country_code": "HK",
+          "org_type": "university"
+        },
+        {
+          "name": "Yu Qiao",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        },
+        {
+          "name": "Wanli Ouyang",
+          "raw_affiliation": "Shanghai AI Lab",
+          "normalized_affiliation": "Shanghai AI Laboratory",
+          "country": "China",
+          "country_code": "CN",
+          "org_type": "research_institute"
+        }
+      ],
+      "source": "manual",
+      "annotator": "Sample Annotator",
+      "annotation_date": "2024-12-13",
+      "notes": "Test paper with many authors for evaluation"
+    }
+  ]
+}

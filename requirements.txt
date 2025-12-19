@@ -1,0 +1,47 @@
+# Conference Paper Agent - Зависимости проекта
+
+# LLM и агенты
+langchain>=0.3.0
+langchain-openai>=0.2.0
+langgraph>=0.2.0
+
+# Работа с ArXiv
+arxiv>=2.1.0
+
+# Парсинг PDF
+pymupdf>=1.24.0  # fitz
+
+# Валидация данных
+pydantic>=2.0.0
+
+# Аналитика
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Визуализация
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# Сетевой анализ
+networkx>=3.1
+
+# Утилиты
+python-dotenv>=1.0.0
+tqdm>=4.65.0
+tenacity>=8.2.0  # retry logic
+httpx>=0.24.0    # async HTTP
+aiofiles>=23.1.0
+
+# Fuzzy matching для нормализации
+rapidfuzz>=3.0.0
+
+# Web API
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+websockets>=13.0
+python-multipart>=0.0.9
+
+# Опционально: база данных
+# sqlalchemy>=2.0.0
+# sqlite-utils>=3.30
