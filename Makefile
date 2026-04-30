@@ -3,7 +3,8 @@
 # =============================================================================
 
 .PHONY: help install install-backend install-frontend run backend frontend stop \
-        docker-up docker-down docker-build docker-logs test lint clean
+        docker-up docker-down docker-build docker-logs \
+        setup test lint typecheck repro v1-cli v2-cli clean
 
 # Variables
 PYTHON := python3
@@ -19,29 +20,36 @@ FRONTEND_PORT := 5173
 
 help:
 	@echo ""
-	@echo "Conference Paper Agent - Makefile Commands"
-	@echo "==========================================="
+	@echo "Paper-Agent — Makefile Commands"
+	@echo "================================"
 	@echo ""
-	@echo "Installation:"
-	@echo "  make install           - Install all dependencies"
+	@echo "Setup:"
+	@echo "  make setup             - Install deps + verify .env (first-time)"
+	@echo "  make install           - Install all dependencies (backend + frontend)"
 	@echo "  make install-backend   - Install Python dependencies"
 	@echo "  make install-frontend  - Install Node.js dependencies"
 	@echo ""
 	@echo "Run locally:"
+	@echo "  make v1-cli            - Run v1 CLI (python -m src.v1.main)"
+	@echo "  make v2-cli            - Run v2 CLI (placeholder)"
 	@echo "  make run               - Run backend and frontend"
 	@echo "  make backend           - Run backend only (FastAPI)"
 	@echo "  make frontend          - Run frontend only (Vite)"
 	@echo "  make stop              - Stop all processes"
+	@echo ""
+	@echo "Code quality:"
+	@echo "  make test              - Run pytest test suite"
+	@echo "  make lint              - ruff check src/"
+	@echo "  make typecheck         - mypy src/v2/orchestration src/v2/agents"
+	@echo ""
+	@echo "Research:"
+	@echo "  make repro             - Reproduce benchmark experiments (placeholder)"
 	@echo ""
 	@echo "Docker:"
 	@echo "  make docker-up         - Start Docker Compose"
 	@echo "  make docker-down       - Stop Docker containers"
 	@echo "  make docker-build      - Rebuild Docker images"
 	@echo "  make docker-logs       - Show container logs"
-	@echo ""
-	@echo "Testing:"
-	@echo "  make test              - Run tests"
-	@echo "  make lint              - Check code"
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  make clean             - Remove temp files"
@@ -146,9 +154,9 @@ docker-restart: docker-down docker-up
 test:
 	@echo "Running tests..."
 	@if [ -d "$(VENV_DIR)" ]; then \
-		. $(VENV_DIR)/bin/activate && $(PYTHON) -m pytest tests/ -v; \
+		. $(VENV_DIR)/bin/activate && $(PYTHON) -m pytest -q; \
 	else \
-		$(PYTHON) -m pytest tests/ -v; \
+		$(PYTHON) -m pytest -q; \
 	fi
 
 test-data-sources:
@@ -168,14 +176,39 @@ evaluate:
 	fi
 
 lint:
-	@echo "Checking code..."
+	@echo "Running ruff check..."
 	@if [ -d "$(VENV_DIR)" ]; then \
-		. $(VENV_DIR)/bin/activate && \
-		$(PYTHON) -m flake8 src/ --max-line-length=100 --ignore=E501,W503 || true; \
+		. $(VENV_DIR)/bin/activate && $(PYTHON) -m ruff check src/; \
 	else \
-		$(PYTHON) -m flake8 src/ --max-line-length=100 --ignore=E501,W503 || true; \
+		$(PYTHON) -m ruff check src/; \
 	fi
-	@echo "Check complete"
+	@echo "Lint complete"
+
+typecheck:
+	@echo "Running mypy on v2 packages..."
+	@if [ -d "$(VENV_DIR)" ]; then \
+		. $(VENV_DIR)/bin/activate && $(PYTHON) -m mypy src/v2/orchestration src/v2/agents; \
+	else \
+		$(PYTHON) -m mypy src/v2/orchestration src/v2/agents; \
+	fi
+	@echo "Type-check complete"
+
+repro:
+	@echo "Reproducing benchmark experiments..."
+	@echo "(placeholder — implementation follows DEV_PLAN.md Week 11)"
+	@echo "Usage: make repro EXP=exp001_baseline_grobid"
+
+v1-cli: check-env
+	@echo "Running v1 CLI..."
+	@if [ -d "$(VENV_DIR)" ]; then \
+		. $(VENV_DIR)/bin/activate && $(PYTHON) -m src.v1.main $(ARGS); \
+	else \
+		$(PYTHON) -m src.v1.main $(ARGS); \
+	fi
+
+v2-cli:
+	@echo "v2 CLI placeholder — not yet implemented."
+	@echo "Implementation target: DEV_PLAN.md Week 7 (Critic + end-to-end run)."
 
 # =============================================================================
 # Utilities
@@ -237,11 +270,10 @@ setup: install check-env
 	@echo ""
 	@echo "Setup complete!"
 	@echo ""
-	@echo "To start the system run:"
-	@echo "  make run"
-	@echo ""
-	@echo "Or via Docker:"
-	@echo "  make docker-up"
+	@echo "Run the v1 pipeline:  make v1-cli ARGS='--query cat:cs.AI --max-papers 5'"
+	@echo "Run the test suite:   make test"
+	@echo "Run the full stack:   make run"
+	@echo "Or via Docker:        make docker-up"
 	@echo ""
 
 # Aliases

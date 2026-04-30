@@ -1,0 +1,135 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "paper-agent"
+version = "2.0.0-dev"
+description = "Verifier-grounded multi-agent system for scholarly author–affiliation extraction"
+requires-python = ">=3.11"
+
+# ---------------------------------------------------------------------------
+# Core runtime dependencies (v1 + v2 shared)
+# ---------------------------------------------------------------------------
+dependencies = [
+    # LLM orchestration
+    "langchain>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "langgraph>=0.2.0",
+
+    # Data validation
+    "pydantic>=2.0.0",
+
+    # HTTP clients
+    "httpx[http2]>=0.27.0",
+    "tenacity>=8.2.0",
+
+    # Rate limiting
+    "pyrate-limiter>=3.6",
+
+    # Data sources
+    "arxiv>=2.1.0",
+
+    # PDF parsing — v1 baseline
+    "pymupdf>=1.24.0",
+
+    # Fuzzy matching
+    "rapidfuzz>=3.0.0",
+
+    # DNS resolution (email-domain linker)
+    "dnspython>=2.6",
+
+    # Analytics
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "networkx>=3.1",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "plotly>=5.15.0",
+
+    # Web API
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "websockets>=13.0",
+    "python-multipart>=0.0.9",
+    "aiofiles>=23.1.0",
+
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "tqdm>=4.65.0",
+]
+
+[project.optional-dependencies]
+# ---------------------------------------------------------------------------
+# v2 PDF parsers (heavy deps — install only when needed)
+# ---------------------------------------------------------------------------
+parsers = [
+    "docling>=2.5",          # IBM layout-aware parser (primary)
+    "marker-pdf>=0.3",       # fast secondary parser
+    # nougat-ocr — see below; requires torch, install separately
+]
+
+nougat = [
+    "nougat-ocr>=0.1.17",    # math/table-aware; pulls PyTorch
+]
+
+# ---------------------------------------------------------------------------
+# v2 Knowledge-graph stack
+# ---------------------------------------------------------------------------
+kg = [
+    "kuzu>=0.7",             # embedded graph DB (preferred)
+]
+
+kg-gnn = [
+    "torch>=2.2",
+    "torch-geometric>=2.5",  # or dgl>=2.0 — pick one at install time
+]
+
+# ---------------------------------------------------------------------------
+# Development & CI tooling
+# ---------------------------------------------------------------------------
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "types-tqdm",
+    "types-aiofiles",
+]
+
+[project.scripts]
+paper-agent-v1 = "src.v1.main:main"
+
+# ---------------------------------------------------------------------------
+# Tool configuration
+# ---------------------------------------------------------------------------
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+# v1 is frozen — do not lint or auto-fix it.
+exclude = ["src/v1"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = [
+    "E501",   # line too long — handled by formatter
+    "F403",   # star imports in shims are intentional
+    "F401",   # re-exports in shims are intentional
+    "I001",   # shim files have intentional star-then-explicit import order
+]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+# v1 is frozen — skip strict checks there
+exclude = ["src/v1/", "src/state\\.py", "src/models\\.py", "src/graph\\.py",
+           "src/nodes\\.py", "src/normalizer\\.py", "src/knowledge_base\\.py",
+           "src/evaluation\\.py", "src/analytics/__init__\\.py",
+           "src/api/", "src/data_sources/"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --tb=short"

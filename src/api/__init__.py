@@ -1,29 +1,11 @@
-"""
-FastAPI Backend для Conference Paper Agent.
-
-Модуль предоставляет REST API и WebSocket endpoints для:
-- Запуска анализа статей
-- Отслеживания прогресса в реальном времени
-- Получения результатов и метрик
-- Визуализаций и аналитики
-"""
-
-from .app import create_app
-from .models import (
+# Re-export shim — delegates to the frozen v1 API implementation.
+# Do not add logic here; v2 API lives in src/v2/ (TBD).
+from src.v1.api import *  # noqa: F401, F403
+from src.v1.api import (  # noqa: F401
     AnalysisRequest,
     AnalysisResponse,
     TaskStatus,
     TaskProgress,
     AnalyticsData,
+    TaskManager,
 )
-from .task_manager import TaskManager
-
-__all__ = [
-    "create_app",
-    "AnalysisRequest",
-    "AnalysisResponse", 
-    "TaskStatus",
-    "TaskProgress",
-    "AnalyticsData",
-    "TaskManager",
-]

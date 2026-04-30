@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: ["master", "main", "dev/**"]
+  pull_request:
+    branches: ["master", "main"]
+
+jobs:
+  lint-and-type:
+    name: Lint & type-check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff mypy
+
+      - name: ruff check
+        run: ruff check src/
+
+      - name: mypy — v2 orchestration
+        # Only strict-check new v2 code; v1 is frozen and excluded via pyproject.toml
+        run: mypy src/v2/orchestration src/v2/agents
+        continue-on-error: true   # stubs have no body yet; remove once Week 5 lands
+
+  test:
+    name: Pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install runtime + dev deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run tests
+        env:
+          OPENAI_API_KEY: "sk-test-fake-key-for-ci"
+        run: pytest -q --tb=short
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: .coverage

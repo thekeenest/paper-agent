@@ -1,17 +1,14 @@
 # Conference Paper Agent
-
 """
 Мульти-агентная система для анализа публикаций научных конференций.
 
-Основные компоненты:
-- models: Pydantic модели данных
-- agents: Узлы графа LangGraph
-- graph: Сборка и выполнение агентного графа
-- normalizer: Нормализация названий организаций
-- analytics: Построение отчётов и визуализаций
-- data_sources: Интеграции с ArXiv, Semantic Scholar, OpenAlex, ROR
-- evaluation: Метрики качества и оценка работы системы
+Package layout:
+  src.v1.*     — frozen Spring-2025 linear pipeline (preserved verbatim)
+  src.v2.*     — v2 research-grade multi-agent system (under development)
+  src.*        — re-export shims so legacy `from src.xxx import` keeps working
+
+All new development imports from src.v2.*.
 """
 
-__version__ = "0.2.0"
-__author__ = "Student"
+__version__ = "2.0.0-dev"
+__author__ = "Filipovich Konstantin Mikhailovich"
