@@ -1,14 +1,32 @@
 """
 Parser ensemble — multi-parser PDF extraction with disagreement signalling.
 
-Planned parsers (see DEV_PLAN.md §3.2):
-  DoclingParser   — primary; layout-aware; open-source (IBM, 2024)
-  MarkerParser    — fast secondary; open-source (VikParuchuri/marker)
-  NougatParser    — math/table-aware; optional extra dependency
-  PyMuPDFParser   — v1 fallback; always available
+Public surface
+--------------
+::
 
-The ensemble detects disagreement in the author block and surfaces it to the
-Planner as an active signal (not noise to be smoothed over).
+    from src.v2.parsers import parse_with_ensemble, ParsedDoc, DisagreementSet
 
-Status: STUB — no implementation yet.
+Parsers
+-------
+  pymupdf   — always available; bbox heuristics (raw-text oracle)
+  docling   — primary; IBM layout-aware; set SKIP_HEAVY_PARSERS=1 to skip
+  marker    — fast secondary; markdown via Marker; set SKIP_HEAVY_PARSERS=1 to skip
+  nougat    — optional; math/table-aware; only active when NOUGAT=1
+
+See DEV_PLAN.md §3.2 and docs/architecture.md for the full design.
 """
+
+from .ensemble import parse_with_ensemble
+from .schemas import DisagreementSet, Email, Page, ParsedDoc, Region, RegionDisagreement, Span
+
+__all__ = [
+    "parse_with_ensemble",
+    "ParsedDoc",
+    "DisagreementSet",
+    "RegionDisagreement",
+    "Span",
+    "Email",
+    "Page",
+    "Region",
+]
