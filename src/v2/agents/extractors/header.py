@@ -49,7 +49,7 @@ class HeaderExtractor(BaseExtractor):
     _SYSTEM_PROMPT = _SYSTEM_PROMPT
     _SPECIALIST = "header"
 
-    async def extract(self, doc: ParsedDoc) -> Candidates:  # type: ignore[name-defined]  # noqa: F821
+    async def extract(self, doc: ParsedDoc, retry_hint: str = "") -> Candidates:  # type: ignore[name-defined]  # noqa: F821
         from src.v2.orchestration.contracts import Candidates
 
         spans = doc.headers
@@ -69,8 +69,7 @@ class HeaderExtractor(BaseExtractor):
         _LOG.info("header_extractor.start", n_spans=len(spans))
 
         from ._base import _LLMOutput
-        from langchain_core.messages import HumanMessage, SystemMessage
-        messages = [SystemMessage(content=_SYSTEM_PROMPT), HumanMessage(content=user_text)]
+        messages = self._build_messages(user_text, retry_hint=retry_hint)
 
         raw = await self._chain.ainvoke(messages)
         if not isinstance(raw, _LLMOutput):

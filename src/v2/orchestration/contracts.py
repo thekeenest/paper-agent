@@ -136,9 +136,20 @@ class Verdict(BaseModel):
     candidate_id: str
     decision: Literal["accept", "reject", "retry"]
     confidence: float = Field(ge=0.0, le=1.0)
+    confidence_band: ConfidenceLevel = "medium"
     rationale: str
     evidence_ids: list[str] = Field(
-        description="evidence_id values from ToolEvidence items that informed this verdict"
+        default_factory=list,
+        description="evidence_id values from ToolEvidence items that informed this verdict",
+    )
+    salvage: bool = Field(
+        default=False,
+        description="True when the candidate was rejected by the LLM Critic but accepted "
+        "via the salvage path (≥2 specialists agreed).",
+    )
+    retry_hint: str = Field(
+        default="",
+        description="Populated when decision='retry': guidance for the specialist re-run.",
     )
 
 
@@ -196,6 +207,16 @@ class WorkItem(BaseModel):
 
     # Critic verdicts
     verdicts: list[dict[str, Any]] = Field(default_factory=list)
+
+    # Reflexion memory (per-venue verbal context injected by ReflexionStore)
+    reflexion_memory: str | None = None
+
+    # Retry routing state
+    retry_count: int = 0
+    critic_retry_hints: dict[str, str] = Field(
+        default_factory=dict,
+        description="Maps source_specialist → retry_hint for specialists that need re-run.",
+    )
 
     # Pipeline control
     status: Literal["pending", "running", "complete", "failed"] = "pending"

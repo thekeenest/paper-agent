@@ -62,10 +62,13 @@ class BaseExtractor:
         llm = ChatOpenAI(model=m, temperature=temperature)
         self._chain = llm.with_structured_output(_LLMOutput)
 
-    def _build_messages(self, span_text: str) -> list[Any]:
+    def _build_messages(self, span_text: str, retry_hint: str = "") -> list[Any]:
+        content = span_text
+        if retry_hint:
+            content = f"{span_text}\n\n[Critic retry hint]: {retry_hint}"
         return [
             SystemMessage(content=self._SYSTEM_PROMPT),
-            HumanMessage(content=span_text),
+            HumanMessage(content=content),
         ]
 
     async def _call_llm(self, span_text: str) -> _LLMOutput:
