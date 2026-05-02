@@ -1,14 +1,39 @@
 """
 Specialist extractor agents.
 
-Planned agents (see DEV_PLAN.md §3.3):
-  HeaderExtractor        — parses author block from PDF header region
-  FootnoteExtractor      — parses affiliation footnotes / superscript markers
-  EmailDomainExtractor   — infers institution from author email domains
-  AcknowledgementsAgent  — extracts secondary affiliations from acknowledgements
+Public surface
+--------------
+::
 
-Each extractor returns a typed ExtractionCandidate with a confidence score and
-a source_region field so the Critic can locate the evidence in the PDF.
+    from src.v2.agents.extractors import (
+        HeaderExtractor,
+        FootnoteExtractor,
+        AcknowledgementsExtractor,
+        EmailDomainExtractor,
+        merge_candidates,
+    )
 
-Status: STUB — no implementation yet.
+Each extractor:
+  * receives only its region's spans from ParsedDoc
+  * returns Candidates(items: list[Candidate])
+  * is forbidden from inventing information not in its input spans
+
+merge_candidates() combines all four outputs, promotes confidence="high"
+when ≥2 specialists agree, and builds a full EvidenceTrail.
+
+See DEV_PLAN.md §3.3 and docs/architecture.md.
 """
+
+from .acknowledgements import AcknowledgementsExtractor
+from .email_domain import EmailDomainExtractor
+from .footnote import FootnoteExtractor
+from .header import HeaderExtractor
+from .merge import merge_candidates
+
+__all__ = [
+    "HeaderExtractor",
+    "FootnoteExtractor",
+    "AcknowledgementsExtractor",
+    "EmailDomainExtractor",
+    "merge_candidates",
+]

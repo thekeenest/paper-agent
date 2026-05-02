@@ -206,9 +206,14 @@ v1-cli: check-env
 		$(PYTHON) -m src.v1.main $(ARGS); \
 	fi
 
-v2-cli:
-	@echo "v2 CLI placeholder — not yet implemented."
-	@echo "Implementation target: DEV_PLAN.md Week 7 (Critic + end-to-end run)."
+v2-cli: check-env
+	@echo "Running v2 pipeline..."
+	@$(PYTHON) -m src.v2.cli \
+		--query "$(if $(QUERY),$(QUERY),cat:cs.AI)" \
+		--n "$(if $(N),$(N),1)" \
+		--output "$(if $(OUTPUT),$(OUTPUT),output/v2)" \
+		$(if $(RESUME),--resume,) \
+		$(if $(VERBOSE),--verbose,)
 
 # =============================================================================
 # Utilities
