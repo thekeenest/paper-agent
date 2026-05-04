@@ -1,294 +1,220 @@
-# Conference Paper Agent
+# Paper-Agent v2
 
-Мульти-агентная система для анализа публикаций научных конференций в области Computer Science.
-
-## 🚀 Features
-
-- **Мульти-агентная архитектура** на базе LangGraph
-- **Web UI** с real-time обновлениями прогресса
-- **Множество источников данных**: ArXiv, Semantic Scholar, OpenAlex
-- **Нормализация организаций** через Knowledge Base и ROR
-- **Визуализации**: графики, диаграммы, экспорт в LaTeX
-- **Метрики качества**: Precision/Recall/F1, hallucination detection
-
-## 📸 Screenshots
-
-### Dashboard
-Modern dashboard с обзором задач и статистикой.
-
-### Analysis Page
-Настройка параметров поиска и запуск анализа.
-
-### Results
-Детальные результаты с интерактивными графиками.
+Multi-agent system for author affiliation extraction from conference papers.
+Built on LangGraph with a Planner → Specialist Extractors → Critic → Reflexion pipeline,
+evaluated on **PaperAffilBench** (800 papers, 6 venues, 2021–2023).
 
 ---
 
-## 🛠 Установка
+## Quick Start
 
-### Вариант 1: Docker (рекомендуется)
+### Docker (recommended)
 
 ```bash
-# Клонирование
-git clone https://github.com/your-repo/conf-agent.git
-cd conf-agent
-
-# Создание .env
-cp .env.example .env
-# Отредактируйте .env и добавьте OPENAI_API_KEY
-
-# Запуск через Docker Compose
+cp .env.example .env          # add OPENAI_API_KEY, ANTHROPIC_API_KEY
 docker-compose up --build
 
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
+# v1 API:    http://localhost:8000
+# v2 API:    http://localhost:8001
+# UI (new):  http://localhost:3000  ← Leaderboard / Trace viewer / KG explorer
 ```
 
-### Вариант 2: Локальная разработка
+### Local development
 
 ```bash
-# Backend
-python -m venv venv
-source venv/bin/activate
 pip install -r requirements.txt
-
 cp .env.example .env
-# Добавьте OPENAI_API_KEY в .env
 
-# Запуск API сервера
+# v1 API (original pipeline + WebSocket)
 uvicorn src.api.app:app --reload --port 8000
 
-# Frontend (в новом терминале)
-cd frontend
-npm install
-npm run dev
+# v2 research API (leaderboard / trace / KG)
+uvicorn src.v2.api.app:app --reload --port 8001
 
-# Frontend: http://localhost:5173
+# Frontend
+cd frontend && npm install && npm run dev   # http://localhost:5173
 ```
 
 ---
 
-## 🌐 Deployment (Railway)
+## New in v2
 
-### Backend
-1. Создайте новый проект в Railway
-2. Подключите репозиторий
-3. Railway автоматически найдёт `Dockerfile`
-4. Добавьте переменные окружения:
-   - `OPENAI_API_KEY`
-   - `FRONTEND_URL` (URL вашего фронтенда)
-
-### Frontend
-1. Создайте отдельный проект для фронтенда
-2. Укажите путь `frontend/` как root directory
-3. Railway найдёт `frontend/Dockerfile`
-4. Добавьте переменные:
-   - `VITE_API_URL` (URL вашего бэкенда)
-   - `VITE_WS_URL` (WebSocket URL бэкенда)
+| Feature | Status |
+|---------|--------|
+| Planner → Specialist Extractor ensemble | ✅ |
+| Critic with tool-grounded evidence | ✅ |
+| Reflexion verbal memory per venue | ✅ |
+| PDF parser ensemble (Docling, Marker, PyMuPDF) | ✅ |
+| ROR / OpenAlex / S2AFF institution linkers | ✅ |
+| KuzuDB knowledge graph (800 papers ingested) | ✅ |
+| DHGNN-Lite collaboration forecasting | ✅ |
+| PaperAffilBench 800-paper benchmark | ✅ |
+| LLM-as-judge evaluation (3 judges) | ✅ |
+| React frontend: Leaderboard + Trace + KG explorer | ✅ |
 
 ---
 
-## 📖 Описание
+## UI Pages (new in v2)
 
-Система использует мульти-агентную архитектуру на базе LangGraph для:
-- Поиска публикаций через ArXiv API
-- Скачивания и парсинга PDF-документов
-- Извлечения информации об авторах и аффилиациях
-- Нормализации названий организаций
-- Расчёта библиометрических показателей
-- Построения аналитических отчётов и визуализаций
+### `/leaderboard`
+System comparison table for all 7 baselines on PaperAffilBench test split.
+Columns are sortable. Reads from `experiments/final/reports_cache.json`.
 
-## Поддерживаемые категории ArXiv
+### `/trace/:paper_id`
+Step-by-step execution trace for any paper:
+1. **Plan** — which sources the Planner activated and why
+2. **Parser ensemble** — Docling / Marker outputs + disagreement resolution
+3. **Specialist outputs** — header / footnote / acknowledgements extractions
+4. **Critic verdicts** — accept/reject/uncertain with evidence drill-down
+5. **Reflexion update** — what venue memory was stored
 
-| Категория | Описание |
-|-----------|----------|
-| `cs.AI` | Artificial Intelligence |
-| `cs.LG` | Machine Learning |
-| `cs.CV` | Computer Vision |
-| `cs.CL` | Computational Linguistics / NLP |
-| `cs.NE` | Neural and Evolutionary Computing |
-| `cs.RO` | Robotics |
-| `cs.CR` | Cryptography and Security |
-| `cs.DB` | Databases |
-| `cs.SE` | Software Engineering |
+### `/kg`
+Interactive 2-hop institution collaboration subgraph (React Flow).
+Select venue + year; nodes show org type (education/company).
+Click a node to inspect properties. Read-only.
 
 ---
 
-## 🖥 CLI Usage
+## API Reference
 
-### Базовый запуск
+### v2 endpoints (`http://localhost:8001`)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/health` | Service health check |
+| `GET` | `/api/v2/leaderboard?split=test` | System comparison table |
+| `GET` | `/api/v2/trace/{paper_id}` | Per-paper execution trace |
+| `GET` | `/api/v2/kg/subgraph?venue=NeurIPS&year=2022&hops=2` | KG subgraph |
+
+### v1 endpoints (`http://localhost:8000`, unchanged)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/analyze` | Start analysis task |
+| `GET` | `/api/tasks/{id}` | Task status |
+| `GET` | `/api/tasks/{id}/results` | Full results |
+| `WS` | `/ws/{task_id}` | Real-time progress |
+
+---
+
+## Benchmark — PaperAffilBench
+
+```
+800 papers:  6 venues × 3 years × 40 + 80 hard cases
+Venues:      NeurIPS, ICML, ICLR, ACL, CVPR, KDD
+Years:       2021 – 2023
+Splits:      train=480  dev=160  test=160
+Hard cases:  multi_affiliation, name_ambiguity, consortium_author, …
+```
+
+### Leaderboard (test split, N=160)
+
+| # | System | F1 | ROR-acc | ECE |
+|---|--------|----|---------|-----|
+| 1 | **Full v2** | **0.805** | 0.843 | 0.068 |
+| 2 | Plan→Act+Critic | 0.781 | 0.821 | 0.082 |
+| 3 | Plan→Act | 0.751 | 0.791 | 0.103 |
+| 4 | OpenAlex API | 0.712 | 0.802 | 0.000 |
+| 5 | v1 (frozen) | 0.693 | 0.743 | 0.124 |
+| 6 | GROBID + ROR | 0.671 | 0.724 | 0.000 |
+| 7 | S2AFF | 0.612 | 0.681 | 0.187 |
+
+Full results: `experiments/final/REPORT.md` · `experiments/final/leaderboard.json`
+
+---
+
+## Reproduce Results
 
 ```bash
-# Анализ 10 статей из категории AI
-python main.py --query "cat:cs.AI" --max-papers 10
+# Reproduce report from cache (<30 min, no API calls needed):
+make repro
 
-# Использование Semantic Scholar
-python main.py --query "machine learning" --source semantic_scholar -n 20
+# Full run with LLM judges (requires API keys, ~$20-80):
+make repro-full
 
-# Использование OpenAlex
-python main.py --query "transformer" --source openalex -n 50
+# Single system:
+make bench-run SYSTEM=full_v2 SPLIT=test
+
+# Judge agreement:
+make bench-agreement SPLIT=dev
 ```
-
-### Опции командной строки
-
-```
---query, -q       Поисковый запрос (default: cat:cs.AI)
---max-papers, -n  Максимум статей для обработки (default: 10)
---source, -s      Источник данных: arxiv, semantic_scholar, openalex
---date-from       Начальная дата (YYYYMMDD)
---date-to         Конечная дата (YYYYMMDD)
---output-dir, -o  Директория для результатов (default: ./output)
---show-graph      Показать структуру агентного графа
---no-plots        Пропустить генерацию графиков
---verbose, -v     Подробный вывод
-```
-
-### Примеры запросов ArXiv
-
-| Запрос | Описание |
-|--------|----------|
-| `cat:cs.AI` | Искусственный интеллект |
-| `cat:cs.LG` | Машинное обучение |
-| `cat:cs.CV` | Компьютерное зрение |
-| `cat:cs.CL` | NLP |
-| `cat:cs.NE` | Нейронные сети |
-| `ti:transformer` | Статьи с "transformer" в названии |
-| `au:bengio AND cat:cs.LG` | Статьи Bengio по ML |
 
 ---
 
-## 🏗 Структура проекта
+## Architecture
 
 ```
-conf_agent/
+                         ┌─────────────────────────────────┐
+                         │         Coordinator (LangGraph)  │
+                         └───────────────┬─────────────────┘
+                                         │
+              ┌──────────────────────────┼──────────────────────────┐
+              ▼                          ▼                          ▼
+        ┌──────────┐             ┌──────────────┐           ┌──────────────┐
+        │ Planner  │             │ PDF Parsers  │           │  Reflexion   │
+        │(GPT-4o)  │             │ (3-way ens.) │           │  Memory      │
+        └────┬─────┘             └──────┬───────┘           └──────┬───────┘
+             │                          │                           │
+             ▼                          ▼                           │
+    ┌────────────────┐       ┌─────────────────────┐               │
+    │ Source Router  │       │ Specialist Extractors│               │
+    │  header        │       │  header / footnote  │               │
+    │  footnote      │──────▶│  acknowledgements   │               │
+    │  ack / email   │       │  email_domain / merge│               │
+    └────────────────┘       └──────────┬──────────┘               │
+                                        │                           │
+                                        ▼                           │
+                             ┌─────────────────────┐               │
+                             │  Critic (tool-grounded)│◄────────────┘
+                             │  ROR lookup          │
+                             │  accept/reject/unc.  │
+                             └──────────┬──────────┘
+                                        │
+                                        ▼
+                             ┌─────────────────────┐
+                             │  KuzuDB KG ingest    │
+                             │  + GraphRAG queries  │
+                             └─────────────────────┘
+```
+
+---
+
+## Project Layout
+
+```
+paper-agent/
 ├── src/
-│   ├── api/              # FastAPI backend
-│   │   ├── app.py        # Main API application
-│   │   ├── models.py     # API Pydantic models
-│   │   └── task_manager.py # Background task management
-│   ├── data_sources/     # Data source integrations
-│   │   ├── arxiv_client.py
-│   │   ├── semantic_scholar.py
-│   │   ├── openalex.py
-│   │   └── ror.py
-│   ├── models.py         # Core Pydantic models
-│   ├── state.py          # LangGraph state
-│   ├── nodes.py          # Graph nodes (agents)
-│   ├── graph.py          # Graph assembly
-│   ├── normalizer.py     # Organization normalization
-│   ├── knowledge_base.py # Organization KB
-│   ├── analytics.py      # Analytics & visualizations
-│   └── evaluation.py     # Quality metrics
-├── frontend/             # React + Vite frontend
-│   ├── src/
-│   │   ├── components/   # UI components
-│   │   ├── pages/        # Page components
-│   │   ├── lib/          # API client, utils
-│   │   └── store/        # Zustand state
-│   ├── Dockerfile
-│   └── package.json
-├── data/
-│   ├── pdf_cache/        # PDF cache
-│   └── gold_standard.json # Evaluation dataset
-├── output/               # Results (CSV, JSON, PNG)
-├── main.py               # CLI entry point
-├── run_server.py         # API server entry point
-├── Dockerfile
-├── docker-compose.yml
-├── railway.toml
-├── requirements.txt
-├── .env.example          # Environment config
-└── README.md
+│   ├── v1/                  # v1 pipeline (frozen baseline)
+│   ├── v2/
+│   │   ├── api/             # FastAPI v2 endpoints
+│   │   ├── agents/          # Specialist extractors + Critic
+│   │   ├── orchestration/   # LangGraph coordinator + Planner + Reflexion
+│   │   ├── parsers/         # Docling / Marker / PyMuPDF ensemble
+│   │   ├── linkers/         # ROR / OpenAlex / S2AFF
+│   │   ├── kg/              # KuzuDB schema + ingest + queries + GraphRAG
+│   │   ├── eval/            # Metrics + runner + harness + budget + LLM-judge
+│   │   └── analytics/       # DHGNN-Lite forecasting + baselines
+│   └── api/                 # Shims → v1 (backward compat.)
+├── frontend/                # React + Vite + Tailwind + React Flow
+│   └── src/pages/           # LeaderboardPage, TracePage, KGPage
+├── benchmark/
+│   └── PaperAffilBench/     # manifest.json + gold/ + predictions_cache/
+├── experiments/
+│   └── final/               # REPORT.md + leaderboard.json + tables/ + figures/
+├── tests/                   # 122+ tests
+├── Makefile                 # repro / bench-run / kg-ingest / ...
+└── docker-compose.yml       # v1 API + v2 API + frontend
 ```
 
-## Архитектура
+---
 
-```
-[START]
-   ↓
-[SearchAgent] → ArXiv API
-   ↓
-[FetcherAgent] → PDF download + cache
-   ↓
-[ParserAgent] → PyMuPDF text extraction
-   ↓
-[ExtractorAgent] → LLM structured output (GPT-4o-mini)
-   ↓
-[NormalizerAgent] → KB + fuzzy matching + LLM fallback
-   ↓
-[AggregateAgent] → CSV + JSON + visualizations
-   ↓
-[END]
-```
+## Requirements
 
-## Выходные данные
+- Python 3.11+
+- Node 20+ (frontend)
+- API keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`
+- Optional: `GOOGLE_API_KEY` (Gemini judge), `SEMANTIC_SCHOLAR_API_KEY`
 
-После обработки в директории `output/` создаются:
+## License
 
-- `affiliations_YYYYMMDD_HHMMSS.csv` — таблица всех авторов с аффилиациями
-- `report_YYYYMMDD_HHMMSS.json` — JSON-отчёт со статистикой
-- `top_organizations.png` — график топ организаций
-- `country_distribution.png` — распределение по странам
-- `industry_vs_academia.png` — индустрия vs академия
-- `org_type_distribution.png` — распределение по типам
-
-## Методы извлечения данных
-
-Система сочетает несколько подходов:
-
-| Метод | Назначение | Точность |
-|-------|-----------|----------|
-| Rule-based | Базовое сопоставление по KB | ~80% |
-| Fuzzy matching | Поиск похожих названий | ~85% |
-| Нейросетевые методы | Извлечение из текста | ~92% |
-| GROBID fallback | Резервный парсинг PDF | ~90% |
-
-### Бенчмарки
-
-На тестовой выборке из 100 статей ArXiv (cs.AI, январь 2024):
-- Точность извлечения авторов: **94%**
-- Точность нормализации организаций: **92%**
-- Среднее время обработки: ~15 минут
-
-## Расширение базы знаний
-
-Для добавления новых организаций отредактируйте `src/knowledge_base.py`:
-
-```python
-ORGANIZATION_KB = {
-    "your_org": {
-        "canonical": "Your Organization Name",
-        "variants": ["YON", "Your Org"],
-        "country": "Country",
-        "country_code": "CC",
-        "type": "university",  # или company, research_institute
-        "aliases": []
-    },
-    # ...
-}
-```
-
-## Требования
-
-- Python 3.10+
-- OpenAI API key (для GPT-4o-mini)
-- ~100MB disk space для кэша PDF
-
-## Rate Limits и ограничения
-
-| API | Лимит | Примечание |
-|-----|-------|------------|
-| ArXiv | 1 запрос / 3 сек | Автоматическое соблюдение |
-| Semantic Scholar | ~1 RPS (с ключом) | Требует API key |
-| OpenAlex | Без ограничений | Рекомендуется mailto |
-
-## Возможные расширения
-
-- **Semantic Scholar** — обогащение метаданными об аффилиациях
-- **OpenReview** — данные конференций NeurIPS, ICLR, ICML
-- **ACL Anthology** — конференции по NLP (ACL, EMNLP, NAACL)
-- **ROR API** — нормализация организаций через Research Organization Registry
-
-## Лицензия
-
-MIT License
+MIT
