@@ -395,8 +395,8 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args(argv)
 
-    global _GOLD_DIR
-    _GOLD_DIR = Path(args.gold_dir)
+    import src.v2.eval.runner as _runner_mod
+    _runner_mod._GOLD_DIR = Path(args.gold_dir)
 
     systems = _ALL_SYSTEMS if args.system == "all" else [args.system]
     for system in systems:

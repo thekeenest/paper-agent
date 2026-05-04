@@ -4,8 +4,8 @@
 
 .PHONY: help install install-backend install-frontend run backend frontend stop \
         docker-up docker-down docker-build docker-logs \
-        setup test lint typecheck repro v1-cli v2-cli clean \
-        kg-ingest kg-query
+        setup test lint typecheck repro repro-judges v1-cli v2-cli clean \
+        kg-ingest kg-query bench-run bench-agreement final-report leaderboard
 
 # Variables
 PYTHON := python3
@@ -43,8 +43,14 @@ help:
 	@echo "  make lint              - ruff check src/"
 	@echo "  make typecheck         - mypy src/v2/orchestration src/v2/agents"
 	@echo ""
-	@echo "Research:"
-	@echo "  make repro             - Reproduce benchmark experiments (placeholder)"
+	@echo "Research / Evaluation:"
+	@echo "  make repro             - Reproduce report from cache in <30 min (no API calls)"
+	@echo "  make repro-full        - Full harness run (7 systems × 3 judges, needs API keys)"
+	@echo "  make repro-judges      - Run LLM judge protocol on dev split"
+	@echo "  make bench-run         - Run one system  (SYSTEM=full_v2 SPLIT=test)"
+	@echo "  make bench-agreement   - Compute Cohen κ + Krippendorff α (SPLIT=dev)"
+	@echo "  make final-report      - Regenerate experiments/final/REPORT.md from cache"
+	@echo "  make leaderboard       - Regenerate benchmark/leaderboard.md from cache"
 	@echo ""
 	@echo "KG Layer:"
 	@echo "  make kg-ingest INPUT=output/v2/work_items.jsonl  - Ingest JSONL into KG"
@@ -199,9 +205,62 @@ typecheck:
 	@echo "Type-check complete"
 
 repro:
-	@echo "Reproducing benchmark experiments..."
-	@echo "(placeholder — implementation follows DEV_PLAN.md Week 11)"
-	@echo "Usage: make repro EXP=exp001_baseline_grobid"
+	@echo "Reproducing benchmark experiments from cached predictions..."
+	@echo "  Split: $(if $(SPLIT),$(SPLIT),test)  Budget: $(if $(MAX_USD),$(MAX_USD),80) USD"
+	@$(PYTHON) -m src.v2.eval.harness \
+		--split "$(if $(SPLIT),$(SPLIT),test)" \
+		--max-usd "$(if $(MAX_USD),$(MAX_USD),80)" \
+		--from-cache \
+		--skip-judges \
+		$(if $(QUIET),--quiet,)
+	@echo ""
+	@echo "Report: experiments/final/REPORT.md"
+	@echo "Leaderboard: benchmark/leaderboard.md"
+
+repro-full:
+	@echo "Running full Stage-8 harness (requires API keys + network)..."
+	@$(PYTHON) -m src.v2.eval.harness \
+		--split "$(if $(SPLIT),$(SPLIT),test)" \
+		--max-usd "$(if $(MAX_USD),$(MAX_USD),80)" \
+		$(if $(FROM_SCRATCH),,--from-cache) \
+		$(if $(SKIP_JUDGES),--skip-judges,) \
+		$(if $(QUIET),--quiet,)
+
+repro-judges:
+	@echo "Running LLM judge protocol on dev split..."
+	@$(PYTHON) -m src.v2.eval.llm_judge \
+		--split "$(if $(SPLIT),$(SPLIT),dev)" \
+		--judges claude gpt4o gemini
+
+bench-run:
+	@echo "Running benchmark for system: $(if $(SYSTEM),$(SYSTEM),full_v2) on split: $(if $(SPLIT),$(SPLIT),test)"
+	@$(PYTHON) -m src.v2.eval.runner \
+		--system "$(if $(SYSTEM),$(SYSTEM),full_v2)" \
+		--split "$(if $(SPLIT),$(SPLIT),test)" \
+		$(if $(VERBOSE),--verbose,)
+
+bench-agreement:
+	@echo "Computing inter-annotator and inter-judge agreement..."
+	@$(PYTHON) -m src.v2.eval.agreement \
+		--split "$(if $(SPLIT),$(SPLIT),dev)"
+
+final-report:
+	@echo "Generating experiments/final/REPORT.md..."
+	@$(PYTHON) -m src.v2.eval.harness \
+		--split "$(if $(SPLIT),$(SPLIT),test)" \
+		--skip-judges \
+		--from-cache \
+		--quiet
+	@echo "Done: experiments/final/REPORT.md"
+
+leaderboard:
+	@echo "Updating benchmark/leaderboard.md..."
+	@$(PYTHON) -m src.v2.eval.harness \
+		--split "$(if $(SPLIT),$(SPLIT),test)" \
+		--skip-judges \
+		--from-cache \
+		--quiet
+	@echo "Done: benchmark/leaderboard.md"
 
 # =============================================================================
 # KG Layer
