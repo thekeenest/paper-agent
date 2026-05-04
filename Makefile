@@ -4,7 +4,8 @@
 
 .PHONY: help install install-backend install-frontend run backend frontend stop \
         docker-up docker-down docker-build docker-logs \
-        setup test lint typecheck repro v1-cli v2-cli clean
+        setup test lint typecheck repro v1-cli v2-cli clean \
+        kg-ingest kg-query
 
 # Variables
 PYTHON := python3
@@ -44,6 +45,10 @@ help:
 	@echo ""
 	@echo "Research:"
 	@echo "  make repro             - Reproduce benchmark experiments (placeholder)"
+	@echo ""
+	@echo "KG Layer:"
+	@echo "  make kg-ingest INPUT=output/v2/work_items.jsonl  - Ingest JSONL into KG"
+	@echo "  make kg-query Q='industry_share_by_venue --venue NeurIPS --year 2024'"
 	@echo ""
 	@echo "Docker:"
 	@echo "  make docker-up         - Start Docker Compose"
@@ -197,6 +202,22 @@ repro:
 	@echo "Reproducing benchmark experiments..."
 	@echo "(placeholder — implementation follows DEV_PLAN.md Week 11)"
 	@echo "Usage: make repro EXP=exp001_baseline_grobid"
+
+# =============================================================================
+# KG Layer
+# =============================================================================
+
+kg-ingest:
+	@echo "Ingesting pipeline output into KuzuDB KG..."
+	@$(PYTHON) -m src.v2.kg.cli ingest \
+		--input "$(if $(INPUT),$(INPUT),output/v2/work_items.jsonl)" \
+		--db "$(if $(DB),$(DB),output/v2/kg)"
+
+kg-query:
+	@echo "Running KG query: $(Q)"
+	@$(PYTHON) -m src.v2.kg.cli query \
+		--db "$(if $(DB),$(DB),output/v2/kg)" \
+		$(Q)
 
 v1-cli: check-env
 	@echo "Running v1 CLI..."

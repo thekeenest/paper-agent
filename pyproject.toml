@@ -149,3 +149,4 @@ exclude = ["src/v1/", "src/state\\.py", "src/models\\.py", "src/graph\\.py",
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q --tb=short"
+asyncio_mode = "auto"
