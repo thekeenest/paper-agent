@@ -1,0 +1,10 @@
+[build]
+# Railway will auto-detect Docker and use the root Dockerfile for the backend service.
+# The frontend service is deployed from the frontend/ subdirectory.
+
+[deploy]
+# Health-check: Railway considers the service healthy once /api/v2/health returns 200
+healthcheckPath = "/api/v2/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
