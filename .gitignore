@@ -155,6 +155,7 @@ output/
 !data/gold_standard.json
 !package.json
 !tsconfig.json
+!experiments/final/reports_cache.json
 
 # Logs
 logs/

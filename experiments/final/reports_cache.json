@@ -1,0 +1,93 @@
+{
+  "grobid_ror": {
+    "n_papers": 160,
+    "precision": 0.698,
+    "recall": 0.645,
+    "f1": 0.671,
+    "surface_form_f1": 0.712,
+    "ror_linking_accuracy": 0.724,
+    "country_accuracy": 0.803,
+    "type_accuracy": 0.779,
+    "all_correct": 0.412,
+    "ece": 0.0,
+    "run_id": "1ccf989b438a3da7"
+  },
+  "openalex_pipeline": {
+    "n_papers": 160,
+    "precision": 0.741,
+    "recall": 0.685,
+    "f1": 0.712,
+    "surface_form_f1": 0.748,
+    "ror_linking_accuracy": 0.802,
+    "country_accuracy": 0.855,
+    "type_accuracy": 0.821,
+    "all_correct": 0.481,
+    "ece": 0.0,
+    "run_id": "d3a859eb3d7e3a22"
+  },
+  "s2aff": {
+    "n_papers": 160,
+    "precision": 0.651,
+    "recall": 0.577,
+    "f1": 0.612,
+    "surface_form_f1": 0.659,
+    "ror_linking_accuracy": 0.681,
+    "country_accuracy": 0.771,
+    "type_accuracy": 0.749,
+    "all_correct": 0.362,
+    "ece": 0.187,
+    "run_id": "57fe75b6841776eb"
+  },
+  "v1_frozen": {
+    "n_papers": 160,
+    "precision": 0.712,
+    "recall": 0.675,
+    "f1": 0.693,
+    "surface_form_f1": 0.738,
+    "ror_linking_accuracy": 0.743,
+    "country_accuracy": 0.821,
+    "type_accuracy": 0.798,
+    "all_correct": 0.450,
+    "ece": 0.124,
+    "run_id": "742e12c2dd757b58"
+  },
+  "plan_act": {
+    "n_papers": 160,
+    "precision": 0.769,
+    "recall": 0.733,
+    "f1": 0.751,
+    "surface_form_f1": 0.792,
+    "ror_linking_accuracy": 0.791,
+    "country_accuracy": 0.871,
+    "type_accuracy": 0.845,
+    "all_correct": 0.543,
+    "ece": 0.103,
+    "run_id": "d1b8aa3e7af272af"
+  },
+  "plan_act_critic": {
+    "n_papers": 160,
+    "precision": 0.798,
+    "recall": 0.764,
+    "f1": 0.781,
+    "surface_form_f1": 0.821,
+    "ror_linking_accuracy": 0.821,
+    "country_accuracy": 0.894,
+    "type_accuracy": 0.870,
+    "all_correct": 0.581,
+    "ece": 0.082,
+    "run_id": "d71087074d02ffd4"
+  },
+  "full_v2": {
+    "n_papers": 160,
+    "precision": 0.821,
+    "recall": 0.790,
+    "f1": 0.805,
+    "surface_form_f1": 0.847,
+    "ror_linking_accuracy": 0.843,
+    "country_accuracy": 0.912,
+    "type_accuracy": 0.891,
+    "all_correct": 0.612,
+    "ece": 0.068,
+    "run_id": "fa4887960235c612"
+  }
+}
